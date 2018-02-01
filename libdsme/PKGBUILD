@@ -1,0 +1,28 @@
+# Maintainer: TheKit <nekit1000 at gmail.com>
+pkgname=libdsme-git
+pkgver=0.64.2.r0.g28d3fea
+pkgrel=1
+pkgdesc="CPU and display keepalive and scheduling library"
+arch=('i686' 'x86_64' 'aarch64')
+url="https://git.merproject.org/mer-core/libdsme"
+license=('GPL')
+makedepends=('git' 'check')
+provides=("${pkgname%-git}")
+conflicts=("${pkgname%-git}")
+source=('git+https://git.merproject.org/mer-core/libdsme.git')
+md5sums=('SKIP')
+
+pkgver() {
+	cd "$srcdir/${pkgname%-git}"
+	git describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g'
+}
+
+build() {
+	cd "$srcdir/${pkgname%-git}"
+	make
+}
+
+package() {
+	cd "$srcdir/${pkgname%-git}"
+	make DESTDIR="$pkgdir/" install
+}

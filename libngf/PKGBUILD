@@ -1,0 +1,33 @@
+# Maintainer: TheKit <nekit1000 at gmail.com>
+pkgname=libngf-git
+pkgver=0.26.r0.g06be88d
+pkgrel=1
+pkgdesc="Non-graphic feedback C-based client library"
+arch=('i686' 'x86_64' 'aarch64')
+url="https://git.merproject.org/mer-core/libngf"
+license=('GPL')
+makedepends=('git')
+provides=("${pkgname%-git}")
+conflicts=("${pkgname%-git}")
+source=('git+https://git.merproject.org/mer-core/libngf.git')
+md5sums=('SKIP')
+
+pkgver() {
+	cd "$srcdir/${pkgname%-git}"
+	git describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g'
+}
+
+build() {
+	cd "$srcdir/${pkgname%-git}"
+    ./autogen.sh
+    ./configure --prefix=/usr
+	make
+	doxygen doc/doxygen.cfg
+}
+
+package() {
+	cd "$srcdir/${pkgname%-git}"
+	make DESTDIR="$pkgdir/" install
+	install -d $pkgdir/usr/share/doc/libngf-doc/html/
+    install -m 644 doc/html/* $pkgdir/usr/share/doc/libngf-doc/html/
+}

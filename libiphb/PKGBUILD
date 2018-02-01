@@ -1,0 +1,31 @@
+# Maintainer: TheKit <nekit1000 at gmail.com>
+pkgname=libiphb-git
+pkgver=1.2.4.r0.g5db3ab7
+pkgrel=1
+pkgdesc="C API for using IP Heartbeat service"
+arch=('i686' 'x86_64' 'aarch64')
+url="https://git.merproject.org/mer-core/libiphb"
+license=('GPL')
+depends=('dbus-glib' 'libdsme')
+makedepends=('git' 'mce-headers-git')
+provides=("${pkgname%-git}")
+conflicts=("${pkgname%-git}")
+source=('git+https://git.merproject.org/mer-core/libiphb.git')
+md5sums=('SKIP')
+
+pkgver() {
+	cd "$srcdir/${pkgname%-git}"
+	git describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g'
+}
+
+build() {
+	cd "$srcdir/${pkgname%-git}"
+    ./autogen.sh
+    ./configure --prefix=/usr
+    make
+}
+
+package() {
+	cd "$srcdir/${pkgname%-git}"
+	make DESTDIR="$pkgdir/" install
+}

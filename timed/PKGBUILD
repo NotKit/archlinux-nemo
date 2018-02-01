@@ -1,0 +1,41 @@
+# Maintainer: TheKit <nekit1000 at gmail.com>
+_pkgname=timed
+pkgname=timed-git
+pkgver=3.4.r0.gafaec4e
+pkgrel=1
+pkgdesc="Mer time daemon"
+arch=('i686' 'x86_64' 'aarch64')
+url="https://git.merproject.org/mer-core/timed"
+license=('GPL')
+depends=('dbus' 'libiodata')
+makedepends=('git')
+provides=("${pkgname%-git}")
+conflicts=("${pkgname%-git}")
+source=('git+https://git.merproject.org/mer-core/timed.git')
+md5sums=('SKIP')
+
+pkgver() {
+	cd "$srcdir/$_pkgname"
+	git describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g'
+}
+
+prepare() {
+	cd "$srcdir/$_pkgname"
+    mkdir -p src/h/timed-qt5/
+    cp src/lib/qmacro.h src/h/timed-qt5/qmacro.h
+    sed -i "s|libsystemd-daemon|libsystemd|g" ./src/server/server.pro
+}
+
+build() {
+	cd "$srcdir/$_pkgname"
+    qmake
+    cd src/timed/src/server
+    
+    cd "$srcdir/$_pkgname"
+    make
+}
+
+package() {
+	cd "$srcdir/${pkgname%-git}"
+	make INSTALL_ROOT="$pkgdir/" install
+}

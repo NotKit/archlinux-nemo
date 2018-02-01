@@ -1,0 +1,39 @@
+# Maintainer: TheKit <nekit1000 at gmail.com>
+pkgname=nemo-qml-plugin-devicelock-git
+pkgver=0.2.3.r0.g7348ae1
+pkgrel=1
+pkgdesc="Device lock plugin for Nemo Mobile"
+arch=('i686' 'x86_64' 'aarch64')
+url="https://git.merproject.org/mer-core/nemo-qml-plugin-devicelock"
+license=('GPL')
+depends=('qt5-base' 'nemo-keepalive')
+makedepends=('git')
+provides=("${pkgname%-git}")
+conflicts=("${pkgname%-git}")
+source=('git+https://git.merproject.org/mer-core/nemo-qml-plugin-devicelock.git')
+md5sums=('SKIP')
+
+pkgver() {
+	cd "$srcdir/${pkgname%-git}"
+	git describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g'
+}
+
+prepare() {
+	cd "$srcdir/${pkgname%-git}"
+    sed -i "s|libsystemd-daemon|libsystemd|g" ./src/nemo-devicelock/host/host.pro
+    sed -i "s|libsystemd-daemon|libsystemd|g" ./src/daemon/daemon.pro
+}
+
+build() {
+	cd "$srcdir/${pkgname%-git}"
+	qmake
+	make
+}
+
+package() {
+	cd "$srcdir/${pkgname%-git}"
+	make INSTALL_ROOT="$pkgdir/" install
+	cd "$pkgdir"
+	cp -r lib usr/
+	rm -rf lib
+}

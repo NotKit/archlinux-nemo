@@ -1,0 +1,31 @@
+# Maintainer: TheKit <nekit1000 at gmail.com>
+pkgname=mce-headers-git
+pkgver=1.22.0.r0.ga5ced91
+pkgrel=1
+pkgdesc="Development files for mce"
+arch=('i686' 'x86_64' 'aarch64')
+url="https://git.merproject.org/mer-core/mce-dev"
+license=('GPL')
+makedepends=('git' 'doxygen')
+provides=("${pkgname%-git}")
+conflicts=("${pkgname%-git}")
+source=('git+https://git.merproject.org/mer-core/mce-dev.git')
+md5sums=('SKIP')
+
+pkgver() {
+	cd "$srcdir/mce-dev"
+	git describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g'
+}
+
+build() {
+	cd "$srcdir/mce-dev"
+	make
+	make doc
+}
+
+package() {
+	cd "$srcdir/mce-dev"
+	make DESTDIR="$pkgdir/" install
+	install -d $pkgdir/usr/share/doc/mce-doc/html/
+	install -m 644 doc/html/* $pkgdir/usr/share/doc/mce-doc/html/
+}

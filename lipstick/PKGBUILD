@@ -1,0 +1,50 @@
+# Maintainer: TheKit <nekit1000 at gmail.com>
+pkgname=lipstick-git
+pkgver=0.27.91.r8.ga1234260
+pkgrel=1
+pkgdesc="CPU and display keepalive and scheduling library"
+arch=('i686' 'x86_64' 'aarch64')
+url="https://git.merproject.org/mer-core/lipstick"
+license=('GPL')
+depends=(
+    'qt5-base'
+    'qt5-declarative'
+    'qt5-sensors'
+    'qt5-wayland'
+    'statefs-qt'
+    'libresourceqt'
+    'libusb-moded-qt'
+    'nemo-keepalive'
+    'qtquickcontrols-nemo'
+    'nemo-qml-plugin-dbus'
+    'nemo-qml-plugin-devicelock'
+    
+)
+makedepends=('git' 'libcontentaction' 'libsystemd' 'qt5-tools')
+provides=("${pkgname%-git}")
+conflicts=("${pkgname%-git}")
+#source=('git+https://git.merproject.org/mer-core/lipstick.git')
+source=('git+https://github.com/AsteroidOS/lipstick.git')
+md5sums=('SKIP')
+
+pkgver() {
+	cd "$srcdir/${pkgname%-git}"
+	git describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g'
+}
+
+prepare() {
+	cd "$srcdir/${pkgname%-git}"
+    sed -i "s|libsystemd-daemon|libsystemd|g" ./src/src.pro
+    sed -i "s|#include <EGL/eglext.h>|#include <EGL/eglext.h>\n\n#include <cmath>|g" ./src/compositor/hwcimage.cpp
+}
+
+build() {
+	cd "$srcdir/${pkgname%-git}"
+	qmake
+	make
+}
+
+package() {
+	cd "$srcdir/${pkgname%-git}"
+	make INSTALL_ROOT="$pkgdir/" install
+}

@@ -1,0 +1,36 @@
+# Maintainer: TheKit <nekit1000 at gmail.com>
+pkgname=statefs-qt-git
+pkgver=0.3.3.r0.g6d91f87
+pkgrel=1
+pkgdesc="Statefs Qt bindings"
+arch=('i686' 'x86_64' 'aarch64')
+url="https://git.merproject.org/mer-core/statefs-qt"
+license=('GPL')
+depends=('qt5-base' 'statefs' 'qtaround')
+makedepends=('git')
+provides=("${pkgname%-git}")
+conflicts=("${pkgname%-git}")
+source=('git+https://git.merproject.org/mer-core/statefs-qt.git')
+md5sums=('SKIP')
+
+pkgver() {
+	cd "$srcdir/${pkgname%-git}"
+	git describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g'
+}
+
+prepare() {
+	cd "$srcdir/${pkgname%-git}"
+    sed -i "s|tut>=0.0.3|tut>=0.0.0|g" ./tests/CMakeLists.txt
+}
+
+build() {
+	cd "$srcdir/${pkgname%-git}"
+	cmake -DCMAKE_INSTALL_PREFIX=/usr -DVERSION=$pkgver
+	make
+	make doc
+}
+
+package() {
+	cd "$srcdir/${pkgname%-git}"
+	make DESTDIR="$pkgdir/" install
+}

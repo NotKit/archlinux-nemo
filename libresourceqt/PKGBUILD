@@ -1,0 +1,30 @@
+# Maintainer: TheKit <nekit1000 at gmail.com>
+pkgname=libresourceqt-git
+pkgver=1.29.0.r0.g06e227a
+pkgrel=1
+pkgdesc="Mer Resource Policy Qt API"
+arch=('i686' 'x86_64' 'aarch64')
+url="https://git.merproject.org/mer-core/libresourceqt"
+license=('GPL')
+depends=('qt5-base' 'libresource')
+makedepends=('git')
+provides=("${pkgname%-git}")
+conflicts=("${pkgname%-git}")
+source=('git+https://git.merproject.org/mer-core/libresourceqt.git')
+md5sums=('SKIP')
+
+pkgver() {
+	cd "$srcdir/${pkgname%-git}"
+	git describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g'
+}
+
+build() {
+	cd "$srcdir/${pkgname%-git}"
+	qmake
+	make
+}
+
+package() {
+	cd "$srcdir/${pkgname%-git}"
+	make INSTALL_ROOT="$pkgdir/" install
+}

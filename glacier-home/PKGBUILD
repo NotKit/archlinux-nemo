@@ -1,0 +1,34 @@
+# Maintainer: TheKit <nekit1000 at gmail.com>
+pkgname=glacier-home-git
+pkgver=0.26.12.r5.g75afb29
+pkgrel=1
+pkgdesc="Nemo Glacier UX homescreen"
+arch=('i686' 'x86_64' 'aarch64')
+url="https://git.merproject.org/mer-core/qtaround"
+license=('GPL')
+depends=('qt5-base' 'lipstick')
+makedepends=('git')
+provides=("${pkgname%-git}")
+conflicts=("${pkgname%-git}")
+source=('git+https://github.com/nemomobile-ux/glacier-home.git#branch=manhattan')
+md5sums=('SKIP')
+
+pkgver() {
+	cd "$srcdir/${pkgname%-git}"
+	git describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g'
+}
+
+prepare() {
+	cd "$srcdir/${pkgname%-git}"
+}
+
+build() {
+	cd "$srcdir/${pkgname%-git}"
+	qmake PREFIX=/usr
+	make
+}
+
+package() {
+	cd "$srcdir/${pkgname%-git}"
+	make INSTALL_ROOT="$pkgdir/" install
+}
